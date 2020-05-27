@@ -17,7 +17,7 @@ class UserService(@Autowired private val userRepository: UserRepository) {
         userRepository.save(userData.toUserEntity())
 
     private fun UserCreation.toUserEntity() = User(
-        username = userName,
+        username = username,
         password = password,
         tokenKey = generateTokenKey()
     )
