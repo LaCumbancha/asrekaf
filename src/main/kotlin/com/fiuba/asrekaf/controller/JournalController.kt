@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api")
@@ -16,7 +17,7 @@ class JournalController(@Autowired private val journalRepository : JournalReposi
 
     //creates a journal
     @PostMapping("/journals")
-    fun createJournal(@RequestBody journal : Journal) : Journal = journalRepository.save(journal)
+    fun createJournal(@Valid @RequestBody journal : Journal) : Journal = journalRepository.save(journal)
 
     //gets a single journal
     @GetMapping("journals/{journalId}")
@@ -27,7 +28,7 @@ class JournalController(@Autowired private val journalRepository : JournalReposi
 
     //updates a journal
     @PutMapping("/journals/{journalId}")
-    fun updateJournal(@PathVariable journalId : Long, @RequestBody updatedJournal: Journal)
+    fun updateJournal(@PathVariable journalId : Long, @Valid @RequestBody updatedJournal: Journal)
             : ResponseEntity<Journal> =
         journalRepository.findById(journalId).map{
             val newJournal = it.copy(title = updatedJournal.title, content =  updatedJournal.content)
