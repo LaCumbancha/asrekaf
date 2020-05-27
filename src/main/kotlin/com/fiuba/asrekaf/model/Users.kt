@@ -11,5 +11,5 @@ data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id : Long = 0,
     @get: NotBlank val username : String = "",
     @get: NotBlank val password : String = "",
-    @get: NotBlank val tokenKey: String = ""
+    @get: NotBlank val apiKey: String = ""
 )

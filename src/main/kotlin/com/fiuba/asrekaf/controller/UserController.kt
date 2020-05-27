@@ -1,5 +1,6 @@
 package com.fiuba.asrekaf.controller
 
+import com.fiuba.asrekaf.api.UserApiKey
 import com.fiuba.asrekaf.model.User
 import com.fiuba.asrekaf.api.UserCreation
 import com.fiuba.asrekaf.api.UserLogin
@@ -15,7 +16,7 @@ class UserController(@Autowired private val userService: UserService) {
 
     // Endpoint for creating a user.
     @PostMapping("/users")
-    fun createUser(@Valid @RequestBody userData: UserCreation): User =
+    fun createUser(@Valid @RequestBody userData: UserCreation): UserApiKey =
         userService.createUser(userData)
 
     // User login
