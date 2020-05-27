@@ -11,6 +11,8 @@ import com.fiuba.asrekaf.utils.Hasher
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.streams.asSequence
 
@@ -37,7 +39,11 @@ class UserService(@Autowired private val userRepository: UserRepository) {
             .orElse(ResponseEntity.notFound().build())
 
     companion object {
-        private fun generateToken(tokenKey: String): String = ""
+        private fun generateToken(tokenKey: String): String {
+            val dateTime = LocalDateTime.now()
+            val key = dateTime.format(DateTimeFormatter.ofPattern(tokenTimePattern))
+            return Hasher.hash(tokenKey + key, MD5).toUpperCase().substring(0, 8)
+        }
 
         private fun generateApiKey(): String = ThreadLocalRandom.current()
             .ints(STRING_LENGTH, 0, charPool.size)
@@ -46,6 +52,7 @@ class UserService(@Autowired private val userRepository: UserRepository) {
             .joinToString("")
 
         private const val STRING_LENGTH = 40L
+        private const val tokenTimePattern = "YYYYMMddHHmm"
         private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     }
 
