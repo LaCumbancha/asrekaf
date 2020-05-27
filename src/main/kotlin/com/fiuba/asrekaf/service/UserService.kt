@@ -4,6 +4,7 @@ import com.fiuba.asrekaf.api.UserApiKey
 import com.fiuba.asrekaf.model.User
 import com.fiuba.asrekaf.api.UserCreation
 import com.fiuba.asrekaf.api.UserLogin
+import com.fiuba.asrekaf.model.exception.DatabaseException
 import com.fiuba.asrekaf.repository.UserRepository
 import com.fiuba.asrekaf.utils.HashType.*
 import com.fiuba.asrekaf.utils.Hasher
@@ -17,7 +18,11 @@ import kotlin.streams.asSequence
 class UserService(@Autowired private val userRepository: UserRepository) {
 
     fun createUser(userData: UserCreation) =
-        userRepository.save(userData.toUserEntity()).let { UserApiKey(it.apiKey) }
+        try {
+            UserApiKey(userRepository.save(userData.toUserEntity()).apiKey)
+        } catch (exc: Exception ) {
+            throw DatabaseException("Coulnd't create user.", exc)
+        }
 
     private fun UserCreation.toUserEntity() = User(
         username = username,
