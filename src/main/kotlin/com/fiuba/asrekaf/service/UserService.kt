@@ -29,20 +29,21 @@ class UserService(@Autowired private val userRepository: UserRepository) {
     private fun UserCreation.toUserEntity() = User(
         username = username,
         password = Hasher.hash(password, SHA256),
-        apiKey = generateApiKey()
+        apiKey = generateApiKey(),
+        code = code
     )
 
     fun login(userId: Long, userData: UserLogin): ResponseEntity<User> =
         userRepository.findById(userId)
-            .filter { Hasher.verify(userData.password, it.password, SHA256) && generateToken(it.apiKey) == userData.token }
+            .filter { Hasher.verify(userData.password, it.password, SHA256) && generateToken(it.apiKey, it.code) == userData.token }
             .map { ResponseEntity.ok().body(it) }
             .orElse(ResponseEntity.notFound().build())
 
     companion object {
-        private fun generateToken(tokenKey: String): String {
+        private fun generateToken(tokenKey: String, code: String): String {
             val dateTime = LocalDateTime.now()
             val key = dateTime.format(DateTimeFormatter.ofPattern(tokenTimePattern))
-            return Hasher.hash(tokenKey + key, MD5).toUpperCase().substring(0, 8)
+            return Hasher.hash(code + tokenKey + key, MD5).toUpperCase().substring(0, 8)
         }
 
         private fun generateApiKey(): String = ThreadLocalRandom.current()
