@@ -40,10 +40,10 @@ class UserService(@Autowired private val userRepository: UserRepository) {
             .orElse(ResponseEntity.notFound().build())
 
     companion object {
-        private fun generateToken(tokenKey: String, code: String): String {
+        private fun generateToken(apiKey: String, code: String): String {
             val dateTime = LocalDateTime.now()
-            val key = dateTime.format(DateTimeFormatter.ofPattern(tokenTimePattern))
-            return Hasher.hash(code + tokenKey + key, MD5).toUpperCase().substring(0, 8)
+            val timeKey = dateTime.format(DateTimeFormatter.ofPattern(tokenTimePattern))
+            return Hasher.hash(code + apiKey + timeKey, MD5).toUpperCase().substring(0, 8)
         }
 
         private fun generateApiKey(): String = ThreadLocalRandom.current()
