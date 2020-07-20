@@ -5,6 +5,7 @@ import com.fiuba.asrekaf.model.User
 import com.fiuba.asrekaf.api.UserCreation
 import com.fiuba.asrekaf.api.UserLogin
 import com.fiuba.asrekaf.model.exception.DatabaseException
+import com.fiuba.asrekaf.model.exception.UserException
 import com.fiuba.asrekaf.repository.UserRepository
 import com.fiuba.asrekaf.utils.HashType.*
 import com.fiuba.asrekaf.utils.Hasher
@@ -37,7 +38,7 @@ class UserService(@Autowired private val userRepository: UserRepository) {
         userRepository.findById(userId)
             .filter { Hasher.verify(userData.password, it.password, SHA256) && generateToken(it.apiKey, it.code) == userData.token }
             .map { ResponseEntity.ok().body(it) }
-            .orElse(ResponseEntity.notFound().build())
+            .orElseThrow { throw UserException("Wrong credentials") }
 
     companion object {
         private fun generateToken(apiKey: String, code: String): String {

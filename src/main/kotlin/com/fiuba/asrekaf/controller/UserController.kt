@@ -6,6 +6,7 @@ import com.fiuba.asrekaf.api.UserCreation
 import com.fiuba.asrekaf.api.UserLogin
 import com.fiuba.asrekaf.model.User
 import com.fiuba.asrekaf.model.exception.DatabaseException
+import com.fiuba.asrekaf.model.exception.UserException
 import com.fiuba.asrekaf.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -20,15 +21,13 @@ import javax.validation.Valid
 @RequestMapping("/asrekaf")
 class UserController(@Autowired private val userService: UserService) {
 
-    @PostMapping("/")
-    fun index1(): ResponseEntity<String> = ResponseEntity.status(HttpStatus.OK).body("Index")
-
-    @GetMapping("/")
-    fun index(): ResponseEntity<String> = ResponseEntity.status(HttpStatus.OK).body("Index")
-
     @ExceptionHandler(value = [(DatabaseException::class)])
-    fun exceptionHandler(): ResponseEntity<ErrorMessage> =
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessage("Coulnd't create user"))
+    fun dbExceptionHandler(exc: DatabaseException): ResponseEntity<ErrorMessage> =
+        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessage(exc.message))
+
+    @ExceptionHandler(value = [(UserException::class)])
+    fun userExceptionHandler(exc: UserException): ResponseEntity<ErrorMessage> =
+        ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessage(exc.message))
 
     // Endpoint for creating a user.
     @PostMapping("/users")
