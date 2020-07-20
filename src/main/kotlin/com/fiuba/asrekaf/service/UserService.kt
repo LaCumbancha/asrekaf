@@ -1,5 +1,6 @@
 package com.fiuba.asrekaf.service
 
+import com.fiuba.asrekaf.api.CommonMessage
 import com.fiuba.asrekaf.api.UserApiKey
 import com.fiuba.asrekaf.model.User
 import com.fiuba.asrekaf.api.UserCreation
@@ -22,7 +23,7 @@ class UserService(@Autowired private val userRepository: UserRepository) {
 
     fun createUser(userData: UserCreation) =
         try {
-            UserApiKey(userRepository.save(userData.toUserEntity()).apiKey)
+            with (userRepository.save(userData.toUserEntity())) { UserApiKey(id, apiKey) }
         } catch (exc: Exception ) {
             throw DatabaseException("Coulnd't create user.", exc)
         }
@@ -34,10 +35,10 @@ class UserService(@Autowired private val userRepository: UserRepository) {
         code = code
     )
 
-    fun login(userId: Long, userData: UserLogin): ResponseEntity<User> =
+    fun login(userId: Long, userData: UserLogin): ResponseEntity<CommonMessage> =
         userRepository.findById(userId)
             .filter { Hasher.verify(userData.password, it.password, SHA256) && generateToken(it.apiKey, it.code) == userData.token }
-            .map { ResponseEntity.ok().body(it) }
+            .map { ResponseEntity.ok().body(CommonMessage("Login successful for user #${it.id} ${it.username}")) }
             .orElseThrow { throw UserException("Wrong credentials") }
 
     companion object {

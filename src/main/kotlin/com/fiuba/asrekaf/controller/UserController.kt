@@ -1,6 +1,6 @@
 package com.fiuba.asrekaf.controller
 
-import com.fiuba.asrekaf.api.ErrorMessage
+import com.fiuba.asrekaf.api.CommonMessage
 import com.fiuba.asrekaf.api.UserApiKey
 import com.fiuba.asrekaf.api.UserCreation
 import com.fiuba.asrekaf.api.UserLogin
@@ -22,12 +22,12 @@ import javax.validation.Valid
 class UserController(@Autowired private val userService: UserService) {
 
     @ExceptionHandler(value = [(DatabaseException::class)])
-    fun dbExceptionHandler(exc: DatabaseException): ResponseEntity<ErrorMessage> =
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessage(exc.message))
+    fun dbExceptionHandler(exc: DatabaseException): ResponseEntity<CommonMessage> =
+        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonMessage(exc.message))
 
     @ExceptionHandler(value = [(UserException::class)])
-    fun userExceptionHandler(exc: UserException): ResponseEntity<ErrorMessage> =
-        ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessage(exc.message))
+    fun userExceptionHandler(exc: UserException): ResponseEntity<CommonMessage> =
+        ResponseEntity.status(HttpStatus.NOT_FOUND).body(CommonMessage(exc.message))
 
     // Endpoint for creating a user.
     @PostMapping("/users")
@@ -36,7 +36,7 @@ class UserController(@Autowired private val userService: UserService) {
 
     // User login
     @PutMapping("/users/{userId}")
-    fun updateJournal(@PathVariable userId: Long, @Valid @RequestBody userData: UserLogin): ResponseEntity<User> =
+    fun updateJournal(@PathVariable userId: Long, @Valid @RequestBody userData: UserLogin): ResponseEntity<CommonMessage> =
         userService.login(userId, userData)
 
 }
