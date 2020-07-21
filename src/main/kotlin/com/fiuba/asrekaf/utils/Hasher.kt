@@ -2,7 +2,7 @@ package com.fiuba.asrekaf.utils
 
 import java.security.MessageDigest
 
-enum class HashType(val algorithm: String) { MD5("MD5"), SHA256("SHA-256") }
+enum class HashType(val algorithm: String) { SHA_256("SHA-256"), SHA3_512("SHA3-512") }
 
 object Hasher {
 

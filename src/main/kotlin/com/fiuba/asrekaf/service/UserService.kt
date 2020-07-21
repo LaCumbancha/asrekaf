@@ -30,14 +30,14 @@ class UserService(@Autowired private val userRepository: UserRepository) {
 
     private fun UserCreation.toUserEntity() = User(
         username = username,
-        password = Hasher.hash(password, SHA256),
+        password = Hasher.hash(password, SHA_256),
         apiKey = generateApiKey(),
         code = code
     )
 
     fun login(userId: Long, userData: UserLogin): ResponseEntity<CommonMessage> =
         userRepository.findById(userId)
-            .filter { Hasher.verify(userData.password, it.password, SHA256) && generateToken(it.apiKey, it.code) == userData.token }
+            .filter { Hasher.verify(userData.password, it.password, SHA_256) && generateToken(it.apiKey, it.code) == userData.token }
             .map { ResponseEntity.ok().body(CommonMessage("Login successful for user #${it.id} ${it.username}")) }
             .orElseThrow { throw UserException("Wrong credentials") }
 
@@ -45,7 +45,7 @@ class UserService(@Autowired private val userRepository: UserRepository) {
         private fun generateToken(apiKey: String, code: String): String {
             val dateTime = LocalDateTime.now()
             val timeKey = dateTime.format(DateTimeFormatter.ofPattern(tokenTimePattern))
-            return Hasher.hash(code + apiKey + timeKey, MD5).toUpperCase().substring(0, 8)
+            return Hasher.hash(code + apiKey + timeKey, SHA3_512).toUpperCase().substring(0, 8)
         }
 
         private fun generateApiKey(): String = ThreadLocalRandom.current()
